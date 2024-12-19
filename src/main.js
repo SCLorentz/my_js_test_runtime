@@ -1,5 +1,5 @@
 print("Hello runjs!\n");
 
-print(std.test());
+print(`${std.arg(1)}\n`);
 
 //file("./path.txt");

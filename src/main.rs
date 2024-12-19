@@ -14,7 +14,7 @@ extension!(
     runjs,
     ops = [
         create_file,
-        op_test,
+        op_arg,
     ],
     esm_entry_point = "ext:runjs/runtime.js",
     esm = [dir "src", "runtime.js"],
@@ -22,14 +22,12 @@ extension!(
 
 fn main()
 {
-    let args: Vec<String> = env::args().collect();
-    //
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
         .unwrap();
 
-    if let Err(error) = runtime.block_on(run_js(&args[1])) {
+    if let Err(error) = runtime.block_on(run_js("./src/main.js")) {
         eprintln!("error: {}", error);
     }
 }
@@ -63,7 +61,7 @@ fn create_file(#[string] path: String) -> Result<(), AnyError>
 
 #[op2()]
 #[string]
-fn op_test() -> Result<String, AnyError>
+fn op_arg(arg: i32) -> Result<String, AnyError>
 {
-    Ok("test".to_string())
+    Ok(env::args().nth(arg as usize).unwrap())
 }

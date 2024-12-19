@@ -23,7 +23,7 @@ globalThis.file = (arg) => {
 }
 
 globalThis.std = {
-    test: () => {
-        return core.ops.op_test();
+    arg: (pos) => {
+        return core.ops.op_arg(pos);
     }
 }
