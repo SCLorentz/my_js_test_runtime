@@ -21,3 +21,9 @@ globalThis.print = (...args) => {
 globalThis.file = (arg) => {
     core.ops.create_file(arg);
 }
+
+globalThis.std = {
+    test: () => {
+        return core.ops.op_test();
+    }
+}

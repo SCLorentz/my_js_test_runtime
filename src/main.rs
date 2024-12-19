@@ -10,15 +10,11 @@ use std::{
     env
 };
 
-use deno_ast::MediaType;
-use deno_ast::ParseParams;
-use deno_core::ModuleLoadResponse;
-use deno_core::ModuleSourceCode;
-
 extension!(
     runjs,
     ops = [
         create_file,
+        op_test,
     ],
     esm_entry_point = "ext:runjs/runtime.js",
     esm = [dir "src", "runtime.js"],
@@ -35,21 +31,6 @@ fn main()
 
     if let Err(error) = runtime.block_on(run_js(&args[1])) {
         eprintln!("error: {}", error);
-    }
-}
-
-struct TsModuleLoader;
-
-impl deno_core::ModuleLoader for TsModuleLoader
-{
-    fn resolve(
-        &self,
-        specifier: &str,
-        referrer: &str,
-        _kind: deno_core::ResolutionKind,
-    ) -> Result<deno_core::ModuleSpecifier, deno_core::error::AnyError>
-    {
-        deno_core::resolve_import(specifier, referrer).map_err(|e| e.into())
     }
 }
 
@@ -78,4 +59,11 @@ fn create_file(#[string] path: String) -> Result<(), AnyError>
     File::create(path)?;
     //
     Ok(())
+}
+
+#[op2()]
+#[string]
+fn op_test() -> Result<String, AnyError>
+{
+    Ok("test".to_string())
 }
