@@ -15,9 +15,7 @@ extension!(
     ops = [
         create_file,
         op_arg,
-    ],
-    esm_entry_point = "ext:runjs/runtime.js",
-    esm = [dir "src", "runtime.js"],
+    ]
 );
 
 fn main()
@@ -32,10 +30,26 @@ fn main()
     }
 }
 
+static DEFAULTS: &str = r#"(
+    function init() {
+        globalThis.print = (...args) => {
+            Deno.core.print(args, false);
+        }
+        globalThis.std = {
+            arg: (pos) => {
+                return Deno.core.ops.op_arg(pos);
+            }
+        }
+        globalThis.file = (arg) => {
+            return Deno.core.ops.create_file(arg);
+        }
+    }
+)()"#;
+
 async fn run_js(file_path: &str) -> Result<(), AnyError>
 {
-    let main_module =
-    deno_core::resolve_path(file_path, &std::env::current_dir()?)?;
+    let main_module = deno_core::resolve_path(file_path, &std::env::current_dir()?)?;
+
     let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions
     {
         module_loader: Some(Rc::new(deno_core::FsModuleLoader)),
@@ -43,10 +57,14 @@ async fn run_js(file_path: &str) -> Result<(), AnyError>
         ..Default::default()
     });
 
+    // Executa o código padrão (como a definição de `print`)
+    js_runtime.execute_script("defaults.js", DEFAULTS)?;
+
     let mod_id = js_runtime.load_main_es_module(&main_module).await?;
     let result = js_runtime.mod_evaluate(mod_id);
 
     js_runtime.run_event_loop(Default::default()).await?;
+
     result.await
 }
 
