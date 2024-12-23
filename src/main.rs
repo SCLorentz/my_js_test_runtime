@@ -1,20 +1,22 @@
 use deno_core::{
     error::AnyError,
-    op2,
     extension
 };
 
-use std::{
-    rc::Rc,
-    fs::File,
-    env
-};
+use std::rc::Rc;
+
+mod methods;
+use methods::*;
 
 extension!(
     runjs,
     ops = [
         create_file,
         op_arg,
+        op_input,
+        read_txt_file,
+        exit_program,
+        arg_len
     ]
 );
 
@@ -25,26 +27,10 @@ fn main()
         .build()
         .unwrap();
 
-    if let Err(error) = runtime.block_on(run_js("./src/main.js")) {
+    if let Err(error) = runtime.block_on(run_js("./js/main.js")) {
         eprintln!("error: {}", error);
     }
 }
-
-static DEFAULTS: &str = r#"(
-    function init() {
-        globalThis.print = (...args) => {
-            Deno.core.print(args, false);
-        }
-        globalThis.std = {
-            arg: (pos) => {
-                return Deno.core.ops.op_arg(pos);
-            }
-        }
-        globalThis.file = (arg) => {
-            return Deno.core.ops.create_file(arg);
-        }
-    }
-)()"#;
 
 async fn run_js(file_path: &str) -> Result<(), AnyError>
 {
@@ -66,20 +52,4 @@ async fn run_js(file_path: &str) -> Result<(), AnyError>
     js_runtime.run_event_loop(Default::default()).await?;
 
     result.await
-}
-
-#[op2(fast)]
-fn create_file(#[string] path: String) -> Result<(), AnyError>
-{
-    println!("create file: {}", path);
-    File::create(path)?;
-    //
-    Ok(())
-}
-
-#[op2()]
-#[string]
-fn op_arg(arg: i32) -> Result<String, AnyError>
-{
-    Ok(env::args().nth(arg as usize).unwrap())
 }
