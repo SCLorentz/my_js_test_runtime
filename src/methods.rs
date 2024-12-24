@@ -28,8 +28,6 @@ pub static DEFAULTS: &str = r#"(
         globalThis.new_file = arg => Deno.core.ops.create_file(arg);
 
         globalThis.read_txt = arg => Deno.core.ops.read_txt_file(arg);
-
-        globalThis.get_array = () => Deno.core.ops.get_array();
     }
 )()"#;
 
@@ -88,15 +86,4 @@ pub fn exit_program(arg: i32) -> Result<(), AnyError>
 {
     println!("\nProgram exited with code: {}", arg);
     std::process::exit(arg)
-}
-
-#[op2]
-#[serde]
-pub fn get_array() -> Result<Vec<String>, AnyError> {
-    let values = vec![
-        "Valor1".to_string(),
-        "Valor2".to_string(),
-        "Valor3".to_string(),
-    ];
-    Ok(values)
 }
