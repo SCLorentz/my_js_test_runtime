@@ -1,25 +1,18 @@
-if (std.args_len() > 1 && std.arg(1) == "-f" || std.arg(1) == "--file")
+if (std.args(1) == "-f" || std.args(1) == "--file" && std.args(2))
 {
-    try
-    {
-        print("Reading file...\n");
-        print(read_txt(std.arg(2)));
-        exit(0);
-    }
-    catch (err)
-    {
-        print(err);
-        print("\nopening repl...\n");
+    const something = await read_txt(std.args(2)).catch(err => {
+        print(`${err}\n`);
         repl();
-    }
+    });
+    print(something);
+    std.exit(0);
 }
 
 function repl()
 {
     while (true)
     {
-        print("> ");
-        const value = input();
+        const value = input("> ");
         print(`{ ${value} }\n`);
     }
 }

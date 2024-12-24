@@ -16,7 +16,7 @@ extension!(
         op_input,
         read_txt_file,
         exit_program,
-        arg_len
+        get_array
     ]
 );
 
