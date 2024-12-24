@@ -45,13 +45,13 @@ pub fn create_file(#[string] path: String) -> Result<(), AnyError>
 
 #[op2()]
 #[string]
-pub fn op_arg(arg: i32) -> Result<String, AnyError>
+pub fn op_arg(arg: i32) -> Result<Option<String>, AnyError>
 {
     let args = match env::args().nth(arg as usize) {
         Some(arg) => Some(arg),
-        None => return Err(anyhow!("Argument not found"))
+        None => return Ok(None)
     };
-    Ok(args.unwrap())
+    Ok(Some(args.unwrap()))
 }
 
 #[op2(fast)]
