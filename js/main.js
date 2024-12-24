@@ -14,14 +14,13 @@ if (std.args(1) == "-d")
     std.exit(0);
 }
 
-
 function repl()
 {
     while (true)
     {
         const value = input("> ");
         //
-        print(" { " + value + " }" + "\\n");
+        print(value + "\n");
     }
 }
 
