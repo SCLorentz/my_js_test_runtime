@@ -22,12 +22,16 @@ pub static DEFAULTS: &str = r#"(
             args: pos =>
                 Deno.core.ops.op_arg(pos),
             exit: arg =>
-                Deno.core.ops.exit_program(arg)
+                Deno.core.ops.exit_program(arg),
+            error: arg =>
+                Deno.core.ops.op_error(arg)
         }
 
         globalThis.new_file = arg => Deno.core.ops.create_file(arg);
 
         globalThis.read_txt = arg => Deno.core.ops.read_txt_file(arg);
+
+        globalThis.delay = arg => Deno.core.ops.delay(arg);
     }
 )()"#;
 
@@ -84,6 +88,21 @@ pub async fn read_txt_file(#[string] path: String) -> Result<String, AnyError>
 #[op2(fast)]
 pub fn exit_program(arg: i32) -> Result<(), AnyError>
 {
-    println!("\nProgram exited with code: {}", arg);
+    //println!("\nProgram exited with code: {}", arg);
     std::process::exit(arg)
+}
+
+#[op2(fast)]
+pub fn op_error(#[string] arg: String) -> Result<(), AnyError>
+{
+    // painc!("{}", arg);
+    println!("{}", arg);
+    std::process::exit(1)
+}
+
+#[op2(async)]
+pub async fn delay(arg: i32) -> Result<(), AnyError>
+{
+    std::thread::sleep(std::time::Duration::from_millis(arg as u64));
+    Ok(())
 }

@@ -16,6 +16,8 @@ extension!(
         op_input,
         read_txt_file,
         exit_program,
+        op_error,
+        delay
     ]
 );
 
