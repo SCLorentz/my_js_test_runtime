@@ -8,6 +8,8 @@ use std::{
     env, fs::File
 };
 
+use crate::runjs;
+
 pub static DEFAULTS: &str = r#"(
     function init()
     {
@@ -24,7 +26,9 @@ pub static DEFAULTS: &str = r#"(
             exit: arg =>
                 Deno.core.ops.exit_program(arg),
             error: arg =>
-                Deno.core.ops.op_error(arg)
+                Deno.core.ops.op_error(arg),
+            eval: arg =>
+                Deno.core.ops.eval(arg)
         }
 
         globalThis.new_file = arg => Deno.core.ops.create_file(arg);
@@ -104,5 +108,23 @@ pub fn op_error(#[string] arg: String) -> Result<(), AnyError>
 pub async fn delay(arg: i32) -> Result<(), AnyError>
 {
     std::thread::sleep(std::time::Duration::from_millis(arg as u64));
+    Ok(())
+}
+
+// create an eval function
+#[op2(fast, reentrant)]
+pub fn eval(#[string] arg: String) -> Result<(), AnyError>
+{
+    let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions
+    {
+        module_loader: Some(std::rc::Rc::new(deno_core::FsModuleLoader)),
+        extensions: vec![runjs::init_ops_and_esm()],
+        ..Default::default()
+    });
+
+    js_runtime.execute_script("defaults.js", DEFAULTS)?;
+
+    js_runtime.execute_script("eval.js", arg)?;
+
     Ok(())
 }
