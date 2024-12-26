@@ -6,7 +6,7 @@ use deno_core::{
     serde_json
 };
 
-use std::collections::HashMap;
+//use std::collections::HashMap;
 
 use std::{
     env, fs::File
@@ -158,32 +158,17 @@ struct Token
 
 fn get_token_type(token: &str) -> TokenType
 {
+    // ! this is ineffective and shouldn't be used for production
     match token
     {
+        c if c.parse::<serde_json::Value>().is_ok() => return TokenType::Json,
         c if c.parse::<f64>().is_ok() => return TokenType::Number,
         c if c.parse::<bool>().is_ok() => return TokenType::Boolean,
-        c if c.parse::<serde_json::Value>().is_ok() => return TokenType::Json,
-        c if c.parse::<String>().is_ok() => return TokenType::String,
         "null" => return TokenType::Null,
         "if" => return TokenType::If,
         "else" => return TokenType::Else,
+        c if c.parse::<String>().is_ok() => return TokenType::String,
         // TODO: add a method of sub-tokenization for more precise results
-        // ! this is ugly and is not fully working, there should be a better way to do what I want
-        /*{
-            let value = c.split_whitespace();
-
-            for each in value
-            {
-                match each
-                {
-                    "if" => return TokenType::If,
-                    "else" => return TokenType::Else,
-                    "null" => return TokenType::Null,
-                    _ => return get_token_type(each)
-                }
-            }
-            return TokenType::Identifier
-        },*/
         _ => return TokenType::Identifier
     }
 }
@@ -192,20 +177,17 @@ fn get_token_type(token: &str) -> TokenType
 #[serde]
 pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
 {
-    //let tokens = arg.split_whitespace().collect::<Vec<&str>>();
+    let tokens = arg.split_whitespace().collect::<Vec<&str>>();
 
     let mut result: Vec<Token> = Vec::new();
-
-    let token_type = get_token_type(&arg);
-    //
-    result.push(Token { token_type, value: arg.to_string() });
     
-    /*for token in tokens.clone()
+    // TODO: create a recursive function here
+    for token in tokens.clone()
     {
         let token_type = get_token_type(token);
         //
         result.push(Token { token_type, value: token.to_string() });
-    }*/
+    }
 
     Ok(serde_json::json!(result))
 }
