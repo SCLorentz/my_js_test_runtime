@@ -18,7 +18,8 @@ extension!(
         exit_program,
         op_error,
         delay,
-        eval
+        eval,
+        tokenize
     ]
 );
 

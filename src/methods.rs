@@ -1,8 +1,12 @@
+use deno_core::serde;
+
 use deno_core::{
     error::AnyError,
     op2,
     serde_json
 };
+
+use std::collections::HashMap;
 
 use std::{
     env, fs::File
@@ -36,6 +40,8 @@ pub static DEFAULTS: &str = r#"(
         globalThis.read_txt = arg => Deno.core.ops.read_txt_file(arg);
 
         globalThis.delay = arg => Deno.core.ops.delay(arg);
+
+        globalThis.tokenize = arg => Deno.core.ops.tokenize(arg);
     }
 )()"#;
 
@@ -52,14 +58,14 @@ pub fn op_arg(arg: Option<i32>) -> Result<Option<serde_json::Value>, AnyError>
 {
     let arg =  match arg
     {
-        None => return Ok(Some(env::args().into_iter().map(serde_json::Value::String).collect())),
-        Some(arg) => arg
+        Some(arg) => arg,
+        _ => return Ok(Some(env::args().into_iter().map(serde_json::Value::String).collect())),
     };
 
     match env::args().nth(arg as usize)
     {
         Some(arg) => return Ok(Some(serde_json::Value::String(arg))),
-        None => return Ok(None)
+        _ => return Ok(None)
     };
 }
 
@@ -127,4 +133,79 @@ pub fn eval(#[string] arg: String) -> Result<(), AnyError>
     js_runtime.execute_script("eval.js", arg)?;
 
     Ok(())
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+enum TokenType
+{
+    String,
+    Number,
+    Boolean,
+    Null,
+    Json,
+    //
+    Identifier,
+    If,
+    Else,
+}
+
+#[derive(Debug, serde::Serialize)]
+struct Token
+{
+    token_type: TokenType,
+    value: String
+}
+
+fn get_token_type(token: &str) -> TokenType
+{
+    match token
+    {
+        c if c.parse::<f64>().is_ok() => return TokenType::Number,
+        c if c.parse::<bool>().is_ok() => return TokenType::Boolean,
+        c if c.parse::<serde_json::Value>().is_ok() => return TokenType::Json,
+        c if c.parse::<String>().is_ok() => return TokenType::String,
+        "null" => return TokenType::Null,
+        "if" => return TokenType::If,
+        "else" => return TokenType::Else,
+        // TODO: add a method of sub-tokenization for more precise results
+        // ! this is ugly and is not fully working, there should be a better way to do what I want
+        /*{
+            let value = c.split_whitespace();
+
+            for each in value
+            {
+                match each
+                {
+                    "if" => return TokenType::If,
+                    "else" => return TokenType::Else,
+                    "null" => return TokenType::Null,
+                    _ => return get_token_type(each)
+                }
+            }
+            return TokenType::Identifier
+        },*/
+        _ => return TokenType::Identifier
+    }
+}
+
+#[op2()]
+#[serde]
+pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
+{
+    //let tokens = arg.split_whitespace().collect::<Vec<&str>>();
+
+    let mut result: Vec<Token> = Vec::new();
+
+    let token_type = get_token_type(&arg);
+    //
+    result.push(Token { token_type, value: arg.to_string() });
+    
+    /*for token in tokens.clone()
+    {
+        let token_type = get_token_type(token);
+        //
+        result.push(Token { token_type, value: token.to_string() });
+    }*/
+
+    Ok(serde_json::json!(result))
 }

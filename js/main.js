@@ -20,7 +20,9 @@ function repl()
     {
         const value = input("> ");
         //
-        print(value + "\n");
+        const tokens = tokenize(value);
+        //
+        console.log(tokens);
     }
 }
 

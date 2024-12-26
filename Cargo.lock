@@ -1288,6 +1288,8 @@ version = "0.1.0"
 dependencies = [
  "deno_ast",
  "deno_core",
+ "serde",
+ "serde_json",
  "tokio",
 ]
 
