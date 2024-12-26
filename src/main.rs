@@ -6,6 +6,8 @@ use deno_core::{
 use std::rc::Rc;
 
 mod methods;
+mod tokenize;
+
 use methods::*;
 
 extension!(

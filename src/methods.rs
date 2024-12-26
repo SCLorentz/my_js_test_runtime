@@ -1,4 +1,6 @@
-use deno_core::serde;
+use crate::runjs;
+
+use crate::tokenize::*;
 
 use deno_core::{
     error::AnyError,
@@ -6,13 +8,9 @@ use deno_core::{
     serde_json
 };
 
-//use std::collections::HashMap;
-
 use std::{
     env, fs::File
 };
-
-use crate::runjs;
 
 pub static DEFAULTS: &str = r#"(
     function init()
@@ -135,59 +133,14 @@ pub fn eval(#[string] arg: String) -> Result<(), AnyError>
     Ok(())
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
-enum TokenType
-{
-    String,
-    Number,
-    Boolean,
-    Null,
-    Json,
-    //
-    Identifier,
-    If,
-    Else,
-}
-
-#[derive(Debug, serde::Serialize)]
-struct Token
-{
-    token_type: TokenType,
-    value: String
-}
-
-fn get_token_type(token: &str) -> TokenType
-{
-    // ! this is ineffective and shouldn't be used for production
-    match token
-    {
-        c if c.parse::<serde_json::Value>().is_ok() => return TokenType::Json,
-        c if c.parse::<f64>().is_ok() => return TokenType::Number,
-        c if c.parse::<bool>().is_ok() => return TokenType::Boolean,
-        "null" => return TokenType::Null,
-        "if" => return TokenType::If,
-        "else" => return TokenType::Else,
-        c if c.parse::<String>().is_ok() => return TokenType::String,
-        // TODO: add a method of sub-tokenization for more precise results
-        _ => return TokenType::Identifier
-    }
-}
-
 #[op2()]
 #[serde]
 pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
 {
-    let tokens = arg.split_whitespace().collect::<Vec<&str>>();
-
-    let mut result: Vec<Token> = Vec::new();
-    
-    // TODO: create a recursive function here
-    for token in tokens.clone()
-    {
-        let token_type = get_token_type(token);
-        //
-        result.push(Token { token_type, value: token.to_string() });
-    }
+    let result = tokenize_recursive(
+        &arg.split_whitespace().collect::<Vec<&str>>(),
+        None
+    );
 
     Ok(serde_json::json!(result))
 }
