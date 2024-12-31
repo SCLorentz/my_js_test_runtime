@@ -120,10 +120,18 @@ pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
 }
 
 const OS: &str = consts::OS;
+const ARCH: &str = consts::ARCH;
 
 #[op2()]
 #[string]
 pub fn get_os() -> Result<String, AnyError>
 {
     return Ok(OS.to_string());
+}
+
+#[op2()]
+#[string]
+pub fn get_arch() -> Result<String, AnyError>
+{
+    return Ok(ARCH.to_string());
 }

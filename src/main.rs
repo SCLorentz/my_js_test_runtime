@@ -22,7 +22,8 @@ extension!(
         delay,
         eval,
         tokenize,
-        get_os
+        get_os,
+        get_arch
     ]
 );
 

@@ -15,7 +15,9 @@ globalThis.std = {
     eval: arg =>
         Deno.core.ops.eval(arg),
     os: _ =>
-        Deno.core.ops.get_os()
+        Deno.core.ops.get_os(),
+    arch: _ =>
+        Deno.core.ops.get_arch()
 }
 
 globalThis.new_file = arg => Deno.core.ops.create_file(arg);
