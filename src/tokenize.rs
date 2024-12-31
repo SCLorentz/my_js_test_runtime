@@ -12,9 +12,11 @@ pub enum TokenType
     Identifier,
     If,
     Else,
+    //
+    Parenthesis,
 }
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, Clone)]
 pub struct Token
 {
     token_type: TokenType,
@@ -33,13 +35,15 @@ fn get_token_type(token: &str) -> TokenType
         "null" => return TokenType::Null,
         "if" => return TokenType::If,
         "else" => return TokenType::Else,
+        "(" => return TokenType::Parenthesis,
+        ")" => return TokenType::Parenthesis,
         c if c.parse::<String>().is_ok() => return TokenType::String,
         // TODO: add a method of sub-tokenization for more precise results
         _ => return TokenType::Identifier
     }
 }
 
-pub fn tokenize_recursive(tokens: &[&str], _last: Option<TokenType>) -> Vec<Token>
+/*pub fn tokenize_recursive(tokens: &[&str], _last: Option<TokenType>) -> Vec<Token>
 {
     let mut result: Vec<Token> = Vec::new();
     //
@@ -50,6 +54,20 @@ pub fn tokenize_recursive(tokens: &[&str], _last: Option<TokenType>) -> Vec<Toke
 
         result.push(Token { token_type, value: first.to_string(), args: None});
         result.extend(extend_recursion);
+    }
+
+    return result;
+}*/
+
+pub fn tokenize_loop(tokens: &[&str]) -> Vec<Token>
+{
+    let mut result: Vec<Token> = Vec::new();
+
+    while let Some(token) = tokens.iter().next()
+    {
+        let token_type = get_token_type(token);
+
+        result.push(Token { token_type, value: token.to_string(), args: None});
     }
 
     return result;

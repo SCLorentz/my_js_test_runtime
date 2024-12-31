@@ -111,10 +111,11 @@ pub fn eval(#[string] arg: String) -> Result<(), AnyError>
 #[serde]
 pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
 {
-    let result = tokenize_recursive(
+    /*let result = tokenize_recursive(
         &arg.split_whitespace().collect::<Vec<&str>>(),
         None
-    );
+    );*/
+    let result = tokenize_loop(&arg.split_whitespace().collect::<Vec<&str>>());
 
     Ok(serde_json::json!(result))
 }

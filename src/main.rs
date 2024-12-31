@@ -31,20 +31,20 @@ const PROGRAM: &[u8] = include_bytes!("../js/main.js");
 
 fn main()
 {
-    let program: Cow<'static, str> = String::from_utf8_lossy(PROGRAM).into_owned().into();
-
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
         .unwrap();
 
-    if let Err(error) = runtime.block_on(run_js(program)) {
+    if let Err(error) = runtime.block_on(run_js()) {
         eprintln!("error: {}", error);
     }
 }
 
-async fn run_js(program: Cow<'static, str>) -> Result<(), AnyError>
+async fn run_js() -> Result<(), AnyError>
 {
+    let program: Cow<'static, str> = String::from_utf8_lossy(PROGRAM).into_owned().into();
+
     let main_module_url = deno_core::resolve_url_or_path("main.js", &std::env::current_dir()?)?;
 
     let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions
