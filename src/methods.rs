@@ -115,7 +115,10 @@ pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
         &arg.split_whitespace().collect::<Vec<&str>>(),
         None
     );*/
-    let result = tokenize_loop(&arg.split_whitespace().collect::<Vec<&str>>());
+    let Some(result) = tokenize_loop(&arg.split_whitespace().collect::<Vec<&str>>()).ok() else
+    {
+        return Err(deno_core::error::custom_error("SyntaxError", "Invalid syntax"))
+    };
 
     Ok(serde_json::json!(result))
 }

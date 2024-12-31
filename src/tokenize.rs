@@ -1,5 +1,7 @@
 use deno_core::serde;
 
+use std::result::Result;
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum TokenType
 {
@@ -12,8 +14,10 @@ pub enum TokenType
     Identifier,
     If,
     Else,
+    Var,
     //
     Parenthesis,
+    Colon,
 }
 
 #[derive(Debug, serde::Serialize, Clone)]
@@ -37,6 +41,8 @@ fn get_token_type(token: &str) -> TokenType
         "else" => return TokenType::Else,
         "(" => return TokenType::Parenthesis,
         ")" => return TokenType::Parenthesis,
+        "var" => return TokenType::Var,
+        ":" => return TokenType::Colon,
         c if c.parse::<String>().is_ok() => return TokenType::String,
         // TODO: add a method of sub-tokenization for more precise results
         _ => return TokenType::Identifier
@@ -59,18 +65,19 @@ fn get_token_type(token: &str) -> TokenType
     return result;
 }*/
 
-pub fn tokenize_loop(tokens: &[&str]) -> Vec<Token>
+pub fn tokenize_loop(tokens: &[&str]) -> Result<Vec<Token>, &'static str>
 {
     let mut result: Vec<Token> = Vec::new();
+    let mut tokens = tokens.iter();
 
-    while let Some(token) = tokens.iter().next()
+    while let Some(token) = tokens.next()
     {
         let token_type = get_token_type(token);
 
         result.push(Token { token_type, value: token.to_string(), args: None});
     }
 
-    return result;
+    return Ok(result);
 }
 
 /* how a print function token should look

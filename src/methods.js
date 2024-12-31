@@ -1,11 +1,13 @@
 globalThis.print = (...args) => Deno.core.print(args, false);
 
-globalThis.input = (...args) => {
-    if (args.length > 0) Deno.core.print(args, true);
+globalThis.input = (...args) =>
+{
+    (args.length > 0) && Deno.core.print(args, true);
     return Deno.core.ops.op_input();
 }
 
-globalThis.std = {
+globalThis.std =
+{
     args: pos =>
         Deno.core.ops.op_arg(pos),
     exit: arg =>
