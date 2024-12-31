@@ -1,0 +1,27 @@
+globalThis.print = (...args) => Deno.core.print(args, false);
+
+globalThis.input = (...args) => {
+    if (args.length > 0) Deno.core.print(args, true);
+    return Deno.core.ops.op_input();
+}
+
+globalThis.std = {
+    args: pos =>
+        Deno.core.ops.op_arg(pos),
+    exit: arg =>
+        Deno.core.ops.exit_program(arg),
+    error: arg =>
+        Deno.core.ops.op_error(arg),
+    eval: arg =>
+        Deno.core.ops.eval(arg),
+    os: _ =>
+        Deno.core.ops.get_os()
+}
+
+globalThis.new_file = arg => Deno.core.ops.create_file(arg);
+
+globalThis.read_txt = arg => Deno.core.ops.read_txt_file(arg);
+
+globalThis.delay = arg => Deno.core.ops.delay(arg);
+
+globalThis.tokenize = arg => Deno.core.ops.tokenize(arg);

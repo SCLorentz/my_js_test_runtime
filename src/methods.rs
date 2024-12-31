@@ -8,40 +8,12 @@ use deno_core::{
     serde_json
 };
 
+use std::borrow::Cow;
 use std::{
-    env, fs::File
+    env::{self, consts}, fs::File
 };
 
-pub static DEFAULTS: &str = r#"(
-    function init()
-    {
-        globalThis.print = (...args) => Deno.core.print(args, false);
-
-        globalThis.input = (...args) => {
-            if (args.length > 0) Deno.core.print(args, true);
-            return Deno.core.ops.op_input();
-        }
-
-        globalThis.std = {
-            args: pos =>
-                Deno.core.ops.op_arg(pos),
-            exit: arg =>
-                Deno.core.ops.exit_program(arg),
-            error: arg =>
-                Deno.core.ops.op_error(arg),
-            eval: arg =>
-                Deno.core.ops.eval(arg)
-        }
-
-        globalThis.new_file = arg => Deno.core.ops.create_file(arg);
-
-        globalThis.read_txt = arg => Deno.core.ops.read_txt_file(arg);
-
-        globalThis.delay = arg => Deno.core.ops.delay(arg);
-
-        globalThis.tokenize = arg => Deno.core.ops.tokenize(arg);
-    }
-)()"#;
+pub const DEFAULTS: &[u8] = include_bytes!("./methods.js");
 
 #[op2(fast)]
 pub fn create_file(#[string] path: String) -> Result<(), AnyError>
@@ -126,7 +98,9 @@ pub fn eval(#[string] arg: String) -> Result<(), AnyError>
         ..Default::default()
     });
 
-    js_runtime.execute_script("defaults.js", DEFAULTS)?;
+    let defaults: Cow<'static, str> = String::from_utf8_lossy(DEFAULTS).into_owned().into();
+
+    js_runtime.execute_script("defaults.js", defaults.clone().into_owned())?;
 
     js_runtime.execute_script("eval.js", arg)?;
 
@@ -143,4 +117,13 @@ pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
     );
 
     Ok(serde_json::json!(result))
+}
+
+const OS: &str = consts::OS;
+
+#[op2()]
+#[string]
+pub fn get_os() -> Result<String, AnyError>
+{
+    return Ok(OS.to_string());
 }

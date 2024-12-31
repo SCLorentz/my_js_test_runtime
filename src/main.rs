@@ -3,7 +3,7 @@ use deno_core::{
     extension
 };
 
-use std::rc::Rc;
+use std::{borrow::Cow, rc::Rc};
 
 mod methods;
 mod tokenize;
@@ -21,25 +21,30 @@ extension!(
         op_error,
         delay,
         eval,
-        tokenize
+        tokenize,
+        get_os
     ]
 );
 
+const PROGRAM: &[u8] = include_bytes!("../js/main.js");
+
 fn main()
 {
+    let program: Cow<'static, str> = String::from_utf8_lossy(PROGRAM).into_owned().into();
+
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
         .unwrap();
 
-    if let Err(error) = runtime.block_on(run_js("./js/main.js")) {
+    if let Err(error) = runtime.block_on(run_js(program)) {
         eprintln!("error: {}", error);
     }
 }
 
-async fn run_js(file_path: &str) -> Result<(), AnyError>
+async fn run_js(program: Cow<'static, str>) -> Result<(), AnyError>
 {
-    let main_module = deno_core::resolve_path(file_path, &std::env::current_dir()?)?;
+    let main_module_url = deno_core::resolve_url_or_path("main.js", &std::env::current_dir()?)?;
 
     let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions
     {
@@ -48,10 +53,11 @@ async fn run_js(file_path: &str) -> Result<(), AnyError>
         ..Default::default()
     });
 
-    // Executa o código padrão (como a definição de `print`)
-    js_runtime.execute_script("defaults.js", DEFAULTS)?;
+    let defaults: Cow<'static, str> = String::from_utf8_lossy(DEFAULTS).into_owned().into();
 
-    let mod_id = js_runtime.load_main_es_module(&main_module).await?;
+    js_runtime.execute_script("defaults.js", defaults.clone().into_owned())?;
+
+    let mod_id = js_runtime.load_main_es_module_from_code(&main_module_url, program.clone().into_owned()).await?;
     let result = js_runtime.mod_evaluate(mod_id);
 
     js_runtime.run_event_loop(Default::default()).await?;
