@@ -102,7 +102,7 @@ pub fn eval(#[string] arg: String) -> Result<(), AnyError>
     js_runtime.execute_script("defaults.js", defaults.clone().into_owned())?;
 
     js_runtime.execute_script("eval.js", arg)?;
-    
+
     Ok(())
 }
 
@@ -114,7 +114,7 @@ pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
         &arg.split_whitespace().collect::<Vec<&str>>(),
         None
     );*/
-    let Some(result) = tokenize_loop(&arg.split_whitespace().collect::<Vec<&str>>()).ok() else
+    let Some(result) = tokenize_loop(TokenizeKind::String(&arg.split_whitespace().collect::<Vec<&str>>())).ok() else
     {
         return Err(deno_core::error::custom_error("SyntaxError", "Invalid syntax"))
     };

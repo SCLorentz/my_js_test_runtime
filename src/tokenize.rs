@@ -15,11 +15,16 @@ pub enum TokenType
     If,
     Else,
     Var,
+    Fn,
     //
     OpenParenthesis,
     CloseParenthesis,
+    OpenBrace,
+    CloseBrace,
+    //
     Colon,
-    Fn,
+    EqualTo,
+    Equals
 }
 
 #[derive(Debug, serde::Serialize, Clone)]
@@ -27,7 +32,8 @@ pub struct Token
 {
     token_type: TokenType,
     value: String,
-    args: Option<Vec<Token>>
+    args: Option<Vec<Token>>,
+    children: Option<Vec<Token>>
 }
 
 fn get_token_type(token: &str) -> TokenType
@@ -46,57 +52,60 @@ fn get_token_type(token: &str) -> TokenType
         "var" => return TokenType::Var,
         ":" => return TokenType::Colon,
         "def" => return TokenType::Fn,
+        "==" => return TokenType::EqualTo,
+        "=" => return TokenType::Equals,
+        "{" => return TokenType::OpenBrace,
+        "}" => return TokenType::CloseBrace,
         c if c.parse::<String>().is_ok() => return TokenType::String,
         // TODO: add a method of sub-tokenization for more precise results
         _ => return TokenType::Identifier
     }
 }
 
-/*pub fn tokenize_recursive(tokens: &[&str], _last: Option<TokenType>) -> Vec<Token>
+pub enum TokenizeKind<'a>
 {
-    let mut result: Vec<Token> = Vec::new();
-    //
-    if let Some((first, rest)) = tokens.split_first()
+    String(&'a [&'a str]),
+    Splited(std::slice::Iter<'a, &'a str>)
+}
+
+pub fn tokenize_loop(tokens: TokenizeKind) -> Result<Vec<Token>, &'static str>
+{
+    let mut tokens = match tokens
     {
-        let token_type = get_token_type(first);
-        let extend_recursion = tokenize_recursive(rest, Some(token_type.clone()));
+        TokenizeKind::String(tokens) => tokens.iter(),
+        TokenizeKind::Splited(tokens) => tokens
+    };
 
-        result.push(Token { token_type, value: first.to_string(), args: None});
-        result.extend(extend_recursion);
-    }
-
-    return result;
-}*/
-
-pub fn tokenize_loop(tokens: &[&str]) -> Result<Vec<Token>, &'static str>
-{
     let mut result: Vec<Token> = Vec::new();
-    let mut tokens = tokens.iter();
 
+    // TODO: make changes to the code for more efficence, less redundancy and more abstraction
     while let Some(token) = tokens.next()
     {
         let token_type = get_token_type(token);
 
+        if token_type == TokenType::CloseParenthesis
+        //|| token_type == TokenType::CloseBrace
+        {
+            return Ok(result);
+        }
+
+        // TODO: make this work with braces and brackets as well
         if token_type == TokenType::OpenParenthesis
         {
-            let mut args: Vec<Token> = Vec::new();
-
-            while let Some(token) = tokens.next()
+            let Some(args) = tokenize_loop(TokenizeKind::Splited(tokens.clone())).ok() else
             {
-                if get_token_type(token) == TokenType::CloseParenthesis { break }
-
-                args.push(Token { token_type: get_token_type(token), value: token.to_string(), args: None});
-            }
+                return Err("SyntaxError");
+            };
 
             if let Some(last) = result.last_mut()
             {
                 last.args = Some(args);
             }
 
-            continue
+            return Ok(result);
         }
 
-        result.push(Token { token_type, value: token.to_string(), args: None});
+        result.push(Token { token_type, value: token.to_string(), args: None, children: None });
     }
 
     return Ok(result);
