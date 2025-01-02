@@ -87,7 +87,6 @@ pub async fn delay(arg: i32) -> Result<(), AnyError>
     Ok(())
 }
 
-// create an eval function
 #[op2(fast, reentrant)]
 pub fn eval(#[string] arg: String) -> Result<(), AnyError>
 {
@@ -103,7 +102,7 @@ pub fn eval(#[string] arg: String) -> Result<(), AnyError>
     js_runtime.execute_script("defaults.js", defaults.clone().into_owned())?;
 
     js_runtime.execute_script("eval.js", arg)?;
-
+    
     Ok(())
 }
 
