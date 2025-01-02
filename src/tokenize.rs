@@ -1,7 +1,6 @@
 use deno_core::serde;
 
 use std::result::Result;
-use std::slice::Iter;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum TokenType
@@ -17,7 +16,8 @@ pub enum TokenType
     Else,
     Var,
     //
-    Parenthesis,
+    OpenParenthesis,
+    CloseParenthesis,
     Colon,
     Fn,
 }
@@ -41,8 +41,8 @@ fn get_token_type(token: &str) -> TokenType
         "nil" => return TokenType::Null,
         "if" => return TokenType::If,
         "else" => return TokenType::Else,
-        "(" => return TokenType::Parenthesis,
-        ")" => return TokenType::Parenthesis,
+        "(" => return TokenType::OpenParenthesis,
+        ")" => return TokenType::CloseParenthesis,
         "var" => return TokenType::Var,
         ":" => return TokenType::Colon,
         "def" => return TokenType::Fn,
@@ -77,41 +77,29 @@ pub fn tokenize_loop(tokens: &[&str]) -> Result<Vec<Token>, &'static str>
     {
         let token_type = get_token_type(token);
 
-        if !tokenize_args(token_type.clone(), tokens.to_owned(), &mut result)
+        if token_type == TokenType::OpenParenthesis
         {
-            result.push(Token { token_type, value: token.to_string(), args: None});
-        };
+            let mut args: Vec<Token> = Vec::new();
+
+            while let Some(token) = tokens.next()
+            {
+                if get_token_type(token) == TokenType::CloseParenthesis { break }
+
+                args.push(Token { token_type: get_token_type(token), value: token.to_string(), args: None});
+            }
+
+            if let Some(last) = result.last_mut()
+            {
+                last.args = Some(args);
+            }
+
+            continue
+        }
+
+        result.push(Token { token_type, value: token.to_string(), args: None});
     }
 
     return Ok(result);
-}
-
-fn tokenize_args(token_type: TokenType, mut tokens: Iter<'_, &str>, result: &mut Vec<Token>) -> bool
-{
-    if token_type != TokenType::Parenthesis
-    {
-        return false
-    }
-
-    let mut args: Vec<Token> = Vec::new();
-
-    while let Some(token) = tokens.next()
-    {
-        args.push(Token { token_type: get_token_type(token), value: token.to_string(), args: None});
-
-        if token_type == TokenType::Parenthesis
-        {
-            break;
-        }
-    }
-
-    tokens.next();
-
-    if let Some(last) = result.last_mut() {
-        last.args = Some(args);
-    }
-
-    true
 }
 
 /* how a print function token should look
