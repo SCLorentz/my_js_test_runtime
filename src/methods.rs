@@ -10,7 +10,7 @@ use deno_core::{
 
 use std::borrow::Cow;
 use std::{
-    env::{self, consts}, fs::File
+    env::{self, consts::{OS, ARCH}}, fs::File
 };
 
 pub const DEFAULTS: &[u8] = include_bytes!("./methods.js");
@@ -122,9 +122,6 @@ pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
     Ok(serde_json::json!(result))
 }
 
-const OS: &str = consts::OS;
-const ARCH: &str = consts::ARCH;
-
 #[op2()]
 #[string]
 pub fn get_os() -> Result<String, AnyError>
@@ -138,3 +135,10 @@ pub fn get_arch() -> Result<String, AnyError>
 {
     return Ok(ARCH.to_string());
 }
+
+/*#[op2(fast)]
+pub fn print(#[string] arg: String) -> Result<(), AnyError>
+{
+    println!("{}", arg);
+    Ok(())
+}*/

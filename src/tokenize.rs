@@ -84,7 +84,6 @@ pub fn tokenize_loop(tokens: TokenizeKind) -> Result<Vec<Token>, &'static str>
         let token_type = get_token_type(token);
 
         if token_type == TokenType::CloseParenthesis
-        //|| token_type == TokenType::CloseBrace
         {
             return Ok(result);
         }
@@ -92,10 +91,7 @@ pub fn tokenize_loop(tokens: TokenizeKind) -> Result<Vec<Token>, &'static str>
         // TODO: make this work with braces and brackets as well
         if token_type == TokenType::OpenParenthesis
         {
-            let Some(args) = tokenize_loop(TokenizeKind::Splited(tokens.clone())).ok() else
-            {
-                return Err("SyntaxError");
-            };
+            let args = tokenize_loop(TokenizeKind::Splited(tokens.clone()))?;
 
             if let Some(last) = result.last_mut()
             {
@@ -133,4 +129,12 @@ print("Hello world", 42)
 }
 
 notice that '()' is ignored at this part
+*/
+
+/*
+writeln("hello world");
+write("hello world\n");
+
+readln("> ");
+
 */
