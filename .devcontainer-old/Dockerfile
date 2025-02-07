@@ -17,7 +17,7 @@ RUN chmod +x ~/rustup-init \
     && rm -rf ~/rustup-init \
     && chmod -R a+w $RUSTUP_HOME $CARGO_HOME
 
-ENV FLASK_APP=zagware
+ENV FLASK_APP=rusty-cb
 EXPOSE 8000
 
 CMD ["/bin/bash", "-l", "-c", "flask run --host 0.0.0.0 --port 8000"]
