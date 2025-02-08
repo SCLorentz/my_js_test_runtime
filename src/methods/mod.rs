@@ -1,7 +1,5 @@
 use crate::runjs;
 
-use crate::tokenize::*;
-
 use deno_core::{
     error::AnyError,
     op2,
@@ -12,6 +10,10 @@ use std::borrow::Cow;
 use std::{
     env::{self, consts::{OS, ARCH}}, fs::File
 };
+
+pub mod tokenize;
+
+use tokenize::{tokenize_loop, TokenizeKind};
 
 pub const DEFAULTS: &[u8] = include_bytes!("./methods.js");
 

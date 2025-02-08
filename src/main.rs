@@ -5,11 +5,10 @@ use deno_core::{
 use std::{borrow::Cow, rc::Rc};
 
 mod methods;
-mod tokenize;
-mod custom_module_loader;
+mod module;
 
 use methods::*;
-use custom_module_loader::*;
+use module::*;
 
 extension!(
     runjs,
@@ -28,7 +27,7 @@ extension!(
     ]
 );
 
-const PROGRAM: &[u8] = include_bytes!("../js/main.js");
+const PROGRAM: &[u8] = include_bytes!("./main.js");
 
 fn main()
 {
