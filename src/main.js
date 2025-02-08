@@ -1,4 +1,4 @@
-import "https://raw.githubusercontent.com/SCLorentz/useless-ts-scripts/refs/heads/main/weirdo.js";
+//import "https://raw.githubusercontent.com/SCLorentz/useless-ts-scripts/refs/heads/main/weirdo.js";
 
 if (std.args(1) == "-f" || std.args(1) == "--file" && std.args(2))
 {

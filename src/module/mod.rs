@@ -5,6 +5,8 @@ use deno_core::{
     anyhow::{bail, Error}, futures::FutureExt, ModuleSource, ModuleSourceCode, ModuleSpecifier, ModuleType, ModuleLoader, ModuleLoadResponse, resolve_import, RequestedModuleType, ResolutionKind
 };
 
+//mod ts;
+
 pub struct SimpleModuleLoader;
 
 impl ModuleLoader for SimpleModuleLoader
