@@ -29,8 +29,6 @@ impl ModuleLoader for SimpleModuleLoader
     {
         let module_specifier = module_specifier.clone();
 
-        println!("hello bro");
-
         deno_core::ModuleLoadResponse::Async(async move
         {
             let mut redirect_module_url = None;
