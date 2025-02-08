@@ -1,10 +1,6 @@
 globalThis.print = (...args) => Deno.core.print(args, false);
 
-globalThis.input = (...args) =>
-{
-    (args.length > 0) && Deno.core.print(args, true);
-    return Deno.core.ops.op_input();
-}
+globalThis.input = (...args) => ((args.length > 0) && Deno.core.print(args, true), Deno.core.ops.op_input());
 
 globalThis.std =
 {

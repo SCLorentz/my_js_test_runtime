@@ -1,14 +1,15 @@
 use deno_core::{
-    error::AnyError,
-    extension
+    error::AnyError, extension, JsRuntime
 };
 
 use std::{borrow::Cow, rc::Rc};
 
 mod methods;
 mod tokenize;
+mod custom_module_loader;
 
 use methods::*;
+use custom_module_loader::*;
 
 extension!(
     runjs,
@@ -47,9 +48,9 @@ async fn run_js() -> Result<(), AnyError>
 
     let main_module_url = deno_core::resolve_url_or_path("main.js", &std::env::current_dir()?)?;
 
-    let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions
+    let mut js_runtime = JsRuntime::new(deno_core::RuntimeOptions
     {
-        module_loader: Some(Rc::new(deno_core::FsModuleLoader)),
+        module_loader: Some(Rc::new(SimpleModuleLoader)),
         extensions: vec![runjs::init_ops_and_esm()],
         ..Default::default()
     });
