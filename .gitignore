@@ -2,3 +2,4 @@
 .VSCodeCounter/
 target/
 Cargo.lock
+.DS_store
