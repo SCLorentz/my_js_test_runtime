@@ -1,6 +1,6 @@
 //import "https://raw.githubusercontent.com/SCLorentz/useless-ts-scripts/refs/heads/main/weirdo.js";
 
-if (std.args(1) == "-f" || std.args(1) == "--file" && std.args(2))
+/*if (std.args(1) == "-f" || std.args(1) == "--file" && std.args(2))
 {
     const something = await read_txt(std.args(2)).catch(_ => std.error("couldn't read file"));
     //
@@ -28,4 +28,9 @@ function repl()
     }
 }
 
-repl();
+repl();*/
+
+window("Hello World!").catch(err => {
+    console.error("Error creating window:", err);
+    std.exit(1);
+});

@@ -23,7 +23,8 @@ extension!(
         eval,
         tokenize,
         get_os,
-        get_arch
+        get_arch,
+        window
     ]
 );
 

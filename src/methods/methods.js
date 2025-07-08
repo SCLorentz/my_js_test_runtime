@@ -25,3 +25,10 @@ globalThis.read_txt = arg => Deno.core.ops.read_txt_file(arg);
 globalThis.delay = arg => Deno.core.ops.delay(arg);
 
 globalThis.tokenize = arg => Deno.core.ops.tokenize(arg);
+
+globalThis.window = (title) => {
+    if (typeof title !== "string") {
+        throw new TypeError("window expects a string argument");
+    }
+    return Deno.core.ops.window(title);
+}

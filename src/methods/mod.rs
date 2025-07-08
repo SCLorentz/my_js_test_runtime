@@ -5,6 +5,7 @@ use deno_core::{
     op2,
     serde_json
 };
+use druid::{AppLauncher, Data, Lens, LocalizedString, Widget, WindowDesc};
 
 use std::borrow::Cow;
 use std::{
@@ -144,3 +145,26 @@ pub fn print(#[string] arg: String) -> Result<(), AnyError>
     println!("{}", arg);
     Ok(())
 }*/
+
+#[derive(Clone, Data, Lens)]
+struct MainState {}
+
+#[op2(fast)]
+pub fn window(#[string] title: String) -> Result<(), AnyError>
+{
+    let main_window = WindowDesc::new(no_widget())
+        .title(LocalizedString::new("title").with_placeholder(title))
+        .window_size((400.0, 400.0));
+
+    let initial_state = MainState {};
+
+    AppLauncher::with_window(main_window)
+        .launch(initial_state)
+        .expect("Failed to launch application");
+    Ok(())
+}
+
+fn no_widget() -> impl Widget<MainState>
+{
+    druid::widget::Label::new("Hello World!")
+}
