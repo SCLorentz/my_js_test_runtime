@@ -10,6 +10,8 @@ mod module;
 use methods::*;
 use module::*;
 
+use crate::methods::window::new_window;
+
 extension!(
     runjs,
     ops = [
@@ -24,7 +26,7 @@ extension!(
         tokenize,
         get_os,
         get_arch,
-        window
+        new_window,
     ]
 );
 

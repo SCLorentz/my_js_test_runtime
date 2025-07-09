@@ -30,7 +30,4 @@ function repl()
 
 repl();*/
 
-window("Hello World!").catch(err => {
-    console.error("Error creating window:", err);
-    std.exit(1);
-});
+window("My Window");

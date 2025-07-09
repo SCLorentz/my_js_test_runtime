@@ -26,9 +26,9 @@ globalThis.delay = arg => Deno.core.ops.delay(arg);
 
 globalThis.tokenize = arg => Deno.core.ops.tokenize(arg);
 
-globalThis.window = (title) => {
+globalThis.window = title => {
     if (typeof title !== "string") {
         throw new TypeError("window expects a string argument");
     }
-    return Deno.core.ops.window(title);
+    return Deno.core.ops.new_window(title)
 }

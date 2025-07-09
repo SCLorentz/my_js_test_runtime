@@ -5,7 +5,6 @@ use deno_core::{
     op2,
     serde_json
 };
-use druid::{AppLauncher, Data, Lens, LocalizedString, Widget, WindowDesc};
 
 use std::borrow::Cow;
 use std::{
@@ -13,6 +12,7 @@ use std::{
 };
 
 pub mod tokenize;
+pub mod window;
 
 use tokenize::{tokenize_loop, TokenizeKind};
 
@@ -137,34 +137,4 @@ pub fn get_os() -> Result<String, AnyError>
 pub fn get_arch() -> Result<String, AnyError>
 {
     return Ok(ARCH.to_string());
-}
-
-/*#[op2(fast)]
-pub fn print(#[string] arg: String) -> Result<(), AnyError>
-{
-    println!("{}", arg);
-    Ok(())
-}*/
-
-#[derive(Clone, Data, Lens)]
-struct MainState {}
-
-#[op2(fast)]
-pub fn window(#[string] title: String) -> Result<(), AnyError>
-{
-    let main_window = WindowDesc::new(no_widget())
-        .title(LocalizedString::new("title").with_placeholder(title))
-        .window_size((400.0, 400.0));
-
-    let initial_state = MainState {};
-
-    AppLauncher::with_window(main_window)
-        .launch(initial_state)
-        .expect("Failed to launch application");
-    Ok(())
-}
-
-fn no_widget() -> impl Widget<MainState>
-{
-    druid::widget::Label::new("Hello World!")
 }

@@ -14,7 +14,7 @@ reqwest = "0.12.12"
 anyhow = "1.0.95"
 ureq = "3.0.4"
 http = "1.2.0"
-druid = "0.8.3"
+winit = "0.30.11"
 
 #[profile.dev]
 #opt-level = "z"
