@@ -30,4 +30,6 @@ function repl()
 
 repl();*/
 
+console.log("a");
 window("My Window");
+console.log("b")
