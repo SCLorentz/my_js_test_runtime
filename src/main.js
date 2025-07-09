@@ -6,12 +6,12 @@
     //
     print(`${something}\n`);
     std.exit(0);
-}
+}*/
 
 if (std.args(1) == "-d")
 {
     const value = "this is a text printed with delay!\n";
-    value.split("").forEach(char => (print(char), 1) && delay(200))
+    value.split("").forEach(char => (print(char), 1) && delay(Math.floor(Math.random() * 300)))
     //
     std.exit(0);
 }
@@ -28,8 +28,7 @@ function repl()
     }
 }
 
-repl();*/
+console.log("My repl with window!");
+let window = new Window("My Window").create();
 
-console.log("a");
-window("My Window");
-console.log("b")
+repl();
