@@ -1,12 +1,12 @@
 //import "https://raw.githubusercontent.com/SCLorentz/useless-ts-scripts/refs/heads/main/weirdo.js";
 
-/*if (std.args(1) == "-f" || std.args(1) == "--file" && std.args(2))
+if (std.args(1) == "-f" || std.args(1) == "--file" && std.args(2))
 {
     const something = await read_txt(std.args(2)).catch(_ => std.error("couldn't read file"));
     //
     print(`${something}\n`);
     std.exit(0);
-}*/
+}
 
 if (std.args(1) == "-d")
 {
@@ -16,19 +16,9 @@ if (std.args(1) == "-d")
     std.exit(0);
 }
 
-function repl()
-{
-    while (true)
-    {
-        const value = input("> ");
-        //
-        const tokens = tokenize(value);
-        //
-        console.log(tokens);
-    }
-}
+var repl = (m,l=console.log,t=process.tokenize) => {while(1)l(t(input(m)))}
 
-console.log("My repl with window!");
+console.log("My repl with window! -", std.os(), std.arch());
 let window = new Window("My Window").create();
 
-repl();
+repl("> ");

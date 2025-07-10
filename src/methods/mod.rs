@@ -7,9 +7,7 @@ use deno_core::{
 };
 
 use std::borrow::Cow;
-use std::{
-    env::{self, consts::{OS, ARCH}}, fs::File
-};
+use std::{env::{self, consts::{OS, ARCH}}, fs::File, process::exit, thread};
 
 pub mod tokenize;
 pub mod window;
@@ -72,21 +70,20 @@ pub async fn read_txt_file(#[string] path: String) -> Result<String, AnyError>
 pub fn exit_program(arg: i32) -> Result<(), AnyError>
 {
     //println!("\nProgram exited with code: {}", arg);
-    std::process::exit(arg)
+    exit(arg)
 }
 
 #[op2(fast)]
-pub fn op_error(#[string] arg: String) -> Result<(), AnyError>
+pub fn op_error(#[string] arg: String, #[string] trace: String) -> Result<(), AnyError>
 {
-    // painc!("{}", arg);
-    println!("{}", arg);
-    std::process::exit(1)
+    println!("Error at {}: {}", trace, arg);
+    exit(1)
 }
 
 #[op2(async)]
 pub async fn delay(arg: i32) -> Result<(), AnyError>
 {
-    std::thread::sleep(std::time::Duration::from_millis(arg as u64));
+    thread::sleep(std::time::Duration::from_millis(arg as u64));
     Ok(())
 }
 
