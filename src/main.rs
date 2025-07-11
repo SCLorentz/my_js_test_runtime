@@ -1,4 +1,4 @@
-use deno_core::{error::AnyError, extension, JsRuntime};
+use deno_core::{error::AnyError, extension, JsRuntime, PollEventLoopOptions};
 use winit::event_loop::EventLoop;
 use std::sync::mpsc::Sender;
 use std::{borrow::Cow, rc::Rc, sync::mpsc};
@@ -22,7 +22,6 @@ extension!(
         exit_program,
         delay,
         eval,
-        tokenize,
         get_os,
         get_arch,
         new_window,
@@ -77,9 +76,12 @@ async fn run_js(tx: Sender<Command>) -> Result<(), AnyError>
     js_runtime.execute_script("defaults.js", defaults.clone().into_owned())?;
 
     let mod_id = js_runtime.load_main_es_module_from_code(&main_module_path, program.clone().into_owned()).await?;
-    let result = js_runtime.mod_evaluate(mod_id);
+    js_runtime.mod_evaluate(mod_id).await?;
+    js_runtime.run_event_loop(PollEventLoopOptions
+    {
+        pump_v8_message_loop: true,
+        wait_for_inspector: false,
+    }).await?;
 
-    js_runtime.run_event_loop(Default::default()).await?;
-
-    result.await
+    Ok(())
 }

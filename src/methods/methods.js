@@ -1,6 +1,4 @@
-globalThis.print = (...args) => Deno.core.print(args, false);
-
-globalThis.input = (...args) => ((args.length > 0) && Deno.core.print(args, true), Deno.core.ops.op_input());
+const { print } = Deno.core;
 
 globalThis.std =
 {
@@ -16,17 +14,24 @@ globalThis.std =
         Deno.core.ops.get_arch(),
 }
 
+var log_op = (err, fn, ...args) =>
+    print((typeof fn == "function" ? fn(args.flat().join(" ")) : [fn, ...args].flat().join(" ")), err || 0);
+
 globalThis.console =
 {
     clear: _ =>
-        Deno.core.ops.op_clear()
+        (Deno.core.ops.op_clear(), 1) && globalThis.console,
+    log: (fn, ...args) =>
+        (log_op(0, fn, ...args), 1) && globalThis.console,
+    err: (fn, ...args) =>
+        (log_op(1, fn, ...args), 1) && globalThis.console,
+    input: (fn, ...args) =>
+        (log_op(0, fn, ...args), new Promise(resolve => resolve(Deno.core.ops.op_input())))
 }
 
 globalThis.process =
 {
     tokenize: arg => Deno.core.ops.tokenize(arg),
-    //
-    
 }
 
 globalThis.new_file = arg => Deno.core.ops.create_file(arg);
@@ -44,8 +49,6 @@ globalThis.Window = class
         this.title = title;
     }
 
-    create()
-    {
+    create = () =>
         Deno.core.ops.new_window(this.title)
-    }
 }

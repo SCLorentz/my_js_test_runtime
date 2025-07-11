@@ -9,10 +9,7 @@ use deno_core::{
 use std::borrow::Cow;
 use std::{env::{self, consts::{OS, ARCH}}, fs::File, process::exit, thread};
 
-pub mod tokenize;
 pub mod window;
-
-use tokenize::{tokenize_loop, TokenizeKind};
 
 pub const DEFAULTS: &[u8] = include_bytes!("./methods.js");
 
@@ -104,22 +101,6 @@ pub fn eval(#[string] arg: String) -> Result<(), AnyError>
     js_runtime.execute_script("eval.js", arg)?;
 
     Ok(())
-}
-
-#[op2()]
-#[serde]
-pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
-{
-    /*let result = tokenize_recursive(
-        &arg.split_whitespace().collect::<Vec<&str>>(),
-        None
-    );*/
-    let Some(result) = tokenize_loop(TokenizeKind::String(&arg.split_whitespace().collect::<Vec<&str>>())).ok() else
-    {
-        return Err(deno_core::error::custom_error("SyntaxError", "Invalid syntax"))
-    };
-
-    Ok(serde_json::json!(result))
 }
 
 #[op2()]
