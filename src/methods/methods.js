@@ -8,20 +8,18 @@ globalThis.std =
         Deno.core.ops.op_arg(pos),
     exit: arg =>
         Deno.core.ops.exit_program(arg),
-    error: arg =>
-    {
-        const err = new Error();
-        console.log(err.stack);
-        const trace = err.stack.split("\n")[1];
-        //
-        Deno.core.ops.op_error(arg, trace)
-    },
     eval: arg =>
         Deno.core.ops.eval(arg),
     os: _ =>
         Deno.core.ops.get_os(),
     arch: _ =>
-        Deno.core.ops.get_arch()
+        Deno.core.ops.get_arch(),
+}
+
+globalThis.console =
+{
+    clear: _ =>
+        Deno.core.ops.op_clear()
 }
 
 globalThis.process =

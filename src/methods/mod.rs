@@ -126,12 +126,19 @@ pub fn tokenize(#[string] arg: String) -> Result<serde_json::Value, AnyError>
 #[string]
 pub fn get_os() -> Result<String, AnyError>
 {
-    return Ok(OS.to_string());
+    Ok(OS.to_string())
 }
 
 #[op2()]
 #[string]
 pub fn get_arch() -> Result<String, AnyError>
 {
-    return Ok(ARCH.to_string());
+    Ok(ARCH.to_string())
+}
+
+#[op2(fast)]
+pub fn op_clear() -> Result<(), AnyError>
+{
+    print!("\x1b[2J\x1b[H");
+    Ok(())
 }

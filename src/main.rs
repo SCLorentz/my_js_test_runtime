@@ -26,6 +26,7 @@ extension!(
         get_os,
         get_arch,
         new_window,
+        op_clear
     ]
 );
 
