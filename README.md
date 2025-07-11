@@ -1,7 +1,17 @@
 # JS-runtime-test
  
-## Ideas:
+## Manage windows
 
-- [ ] Create a bundler, bundle js code like deno with a copy of the binaries of this runtime
-- [ ] Add custom types to TS like 'Maybe<T>'
-- [x] Add custom functions like 'print' to use instead of 'console.log'
+```javascript
+let window = new Window("My Window").create();
+```
+
+## Custom protocol for console
+
+```javascript
+await console
+    .clear()
+    .log("hello world!\n")
+    .input("what's your name? ")
+    .then(name => console.log(`hello ${name}!`))
+```
